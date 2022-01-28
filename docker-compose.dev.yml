@@ -1,13 +1,58 @@
 version: '3.9'
 services:
   web:
+    container_name: rjournal.backend
     image: node:17-alpine3.14
     ports:
-      - '3001:3001'
+      - '5000:5000'
     volumes:
       - '.:/app'
     environment:
       NODE_ENV: development
       HOST: 0.0.0.0
     working_dir: /app
+    depends_on:
+      - postgres
+    restart: always
     command: sh -c "cd /app; yarn install; yarn run start:dev"
+
+  postgres:
+    container_name: postgres
+    hostname: postgres
+    image: postgres:14.1
+    env_file:
+      - .development.env
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - postgres
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - '5050:80'
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:

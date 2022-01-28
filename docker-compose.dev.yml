@@ -11,6 +11,8 @@ services:
       NODE_ENV: development
       HOST: 0.0.0.0
     working_dir: /app
+    networks:
+      - postgres
     depends_on:
       - postgres
     restart: always

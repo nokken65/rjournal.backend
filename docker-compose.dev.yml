@@ -16,7 +16,7 @@ services:
     depends_on:
       - postgres
     restart: always
-    command: sh -c "cd /app; yarn install; yarn run start:dev"
+    command: sh -c "cd /app; yarn install; yarn run dev"
 
   postgres:
     container_name: postgres

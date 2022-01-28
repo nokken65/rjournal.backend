@@ -30,15 +30,24 @@ services:
       - '5432:5432'
     networks:
       - postgres
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d rjournal']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 4G
 
   pgadmin:
     container_name: pgadmin
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    image: dpage/pgadmin4:6
+    env_file:
+      - .development.env
     volumes:
       - pgadmin:/var/lib/pgadmin
     ports:
@@ -47,6 +56,8 @@ services:
       - postgres
     depends_on:
       - postgres
+    logging:
+      driver: none
     restart: unless-stopped
 
 networks:

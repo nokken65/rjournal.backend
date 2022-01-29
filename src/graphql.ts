@@ -7,6 +7,15 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export class CreateRoleInput {
+    value: string;
+    description?: Nullable<string>;
+}
+
+export class UpdateRoleInput {
+    id: UUID;
+}
+
 export class CreateUserInput {
     email: EmailAddress;
     username: string;
@@ -17,27 +26,47 @@ export class UpdateUserInput {
     id: UUID;
 }
 
-export class User {
+export class Role {
     id: UUID;
-    email: EmailAddress;
-    username: string;
-    password: string;
+    value: string;
+    description: string;
+    users: Nullable<User>[];
     createdAt: DateTime;
     updatedAt: DateTime;
 }
 
 export abstract class IQuery {
+    abstract roles(): Nullable<Role>[] | Promise<Nullable<Role>[]>;
+
+    abstract role(id: UUID): Nullable<Role> | Promise<Nullable<Role>>;
+
     abstract users(): Nullable<User>[] | Promise<Nullable<User>[]>;
 
     abstract user(id: UUID): Nullable<User> | Promise<Nullable<User>>;
 }
 
 export abstract class IMutation {
+    abstract createRole(createRoleInput: CreateRoleInput): Role | Promise<Role>;
+
+    abstract updateRole(updateRoleInput: UpdateRoleInput): Role | Promise<Role>;
+
+    abstract removeRole(id: UUID): Nullable<Role> | Promise<Nullable<Role>>;
+
     abstract createUser(createUserInput: CreateUserInput): User | Promise<User>;
 
     abstract updateUser(updateUserInput: UpdateUserInput): User | Promise<User>;
 
     abstract removeUser(id: UUID): Nullable<User> | Promise<Nullable<User>>;
+}
+
+export class User {
+    id: UUID;
+    email: EmailAddress;
+    username: string;
+    password: string;
+    roles?: Nullable<Nullable<Role>[]>;
+    createdAt: DateTime;
+    updatedAt: DateTime;
 }
 
 export type Time = any;

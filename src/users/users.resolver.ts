@@ -1,15 +1,21 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { Prisma } from '@prisma/client';
+import { RolesService } from 'src/roles/roles.service';
 
 @Resolver('User')
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
-
-  @Mutation('createUser')
-  create(@Args('createUserInput') createUserInput: Prisma.UserCreateInput) {
-    return this.usersService.create(createUserInput);
-  }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly rolesService: RolesService,
+  ) {}
 
   @Query('users')
   findAll() {
@@ -32,5 +38,11 @@ export class UsersResolver {
   @Mutation('removeUser')
   remove(@Args('id') id: string) {
     return this.usersService.remove({ id });
+  }
+
+  @ResolveField()
+  roles(@Parent() user: Prisma.UserRolesWhereInput) {
+    const { userId } = user;
+    return this.rolesService.findUserRoles({ userId });
   }
 }

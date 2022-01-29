@@ -5,6 +5,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core/di
 import { join } from 'node:path';
 import { UsersModule } from './users/users.module';
 import { resolvers, typeDefs } from 'graphql-scalars';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { resolvers, typeDefs } from 'graphql-scalars';
       resolvers: { ...resolvers },
     }),
     UsersModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [],

@@ -1,6 +1,6 @@
 version: '3.9'
 services:
-  web:
+  backend:
     container_name: rjournal.backend
     image: node:17-alpine3.14
     ports:
@@ -13,59 +13,16 @@ services:
     working_dir: /app
     networks:
       - postgres
+      - api
     depends_on:
       - postgres
     restart: always
     command: sh -c "cd /app; yarn install; yarn run dev"
 
-  postgres:
-    container_name: postgres
-    hostname: postgres
-    image: postgres:14.1
-    env_file:
-      - .development.env
-    environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    networks:
-      - postgres
-    restart: unless-stopped
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d rjournal']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 4G
-
-  pgadmin:
-    container_name: pgadmin
-    image: dpage/pgadmin4:6
-    env_file:
-      - .development.env
-    volumes:
-      - pgadmin:/var/lib/pgadmin
-    ports:
-      - '5050:80'
-    networks:
-      - postgres
-    depends_on:
-      - postgres
-    logging:
-      driver: none
-    restart: unless-stopped
-
 networks:
   postgres:
+    external: true
+    name: 'rjournal_postgres'
     driver: bridge
-
-volumes:
-  postgres:
-  pgadmin:
+  api:
+    driver: bridge
